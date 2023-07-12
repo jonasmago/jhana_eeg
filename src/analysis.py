@@ -227,16 +227,18 @@ def compute_group_summary(connectome_matrices_4d):
     return group_summary
 
 
-def compare_groups(group_one_matrices_4d, group_two_matrices_4d, measures):
+def compare_groups(
+    group_one_matrices_4d, group_two_matrices_4d, measures, name1, name2
+):
     # Compute summary for both groups
     group_one_summary = compute_group_summary(group_one_matrices_4d)
     group_two_summary = compute_group_summary(group_two_matrices_4d)
 
     # Combine the data from both groups into a single dataframe for visualization
     group_one_df = pd.DataFrame(group_one_summary)
-    group_one_df["group"] = "Group One"
+    group_one_df["group"] = name1
     group_two_df = pd.DataFrame(group_two_summary)
-    group_two_df["group"] = "Group Two"
+    group_two_df["group"] = name2
     data = pd.concat([group_one_df, group_two_df])
 
     # Create a subplot for each measure
@@ -264,7 +266,7 @@ def compare_groups(group_one_matrices_4d, group_two_matrices_4d, measures):
         ax.text(
             0,
             mean_group_one,
-            f"Mean: {mean_group_one:.2f}",
+            f"Mean: {mean_group_one:.4f}",
             color="white",
             ha="center",
             va="center",
