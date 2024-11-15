@@ -1,0 +1,83 @@
+# List of variable pairs you want to correlate
+pairs_to_analyze <- list(
+  c("jhana_stabilit_j1", "jhana_stabilit_j2"),
+  c("jhana_stabilit_j1", "jhana_stabilit_j3"),
+  c("jhana_stabilit_j1", "jhana_stabilit_j4"),
+  
+  c("jhana_stabilit_j1", "lempel_ziv_norm"),
+  c("jhana_stabilit_j1", "nk_lzc"),
+  c("jhana_stabilit_j1", "MODTAS_sum_repeated"),
+  
+  
+  c("meditation_depth_before", "lempel_ziv_norm"),
+  c("meditation_depth_mean", "lempel_ziv_norm"),
+  c("mindfulness_stability_before_beeps", "lempel_ziv_norm"),
+  c("mindfulness_stability_during_beeps", "lempel_ziv_norm"),
+  c("mindfulness_beep_distraction", "lempel_ziv_norm"),
+  c("jhana_beep_distraction", "lempel_ziv_norm"),
+  
+  
+  c("jhana_stabilit_j1", "lempel_ziv_norm"),
+  c("jhana_stabilit_j1", "permutation_entropy"),
+  c("jhana_stabilit_j1", "spectral_entropy"),
+  c("jhana_stabilit_j1", "sample_entropy"),
+  c("jhana_stabilit_j1", "hjorth_mobility"),
+  c("jhana_stabilit_j1", "hjorth_complexity"),
+  c("jhana_stabilit_j1", "nk_fsi"),
+  c("jhana_stabilit_j1", "nk_lle"),
+  c("jhana_stabilit_j1", "nk_sampen"),
+  c("jhana_stabilit_j1", "nk_pen"),
+  c("jhana_stabilit_j1", "nk_lzc"),
+  c("jhana_stabilit_j1", "delta"),
+  c("jhana_stabilit_j1", "theta"),
+  c("jhana_stabilit_j1", "alpha"),
+  c("jhana_stabilit_j1", "beta"),
+  c("jhana_stabilit_j1", "gamma"),
+  
+  c("jhana_stabilit_j1", "Mean_RR"),
+  c("jhana_stabilit_j1", "Mean_Cycle_Duration"),
+  c("jhana_stabilit_j1", "RMSSD")
+  
+  
+)
+
+
+# Loop through each pair of variables
+for (pair in pairs_to_analyze) {
+  
+  # Extract the variables for the current pair
+  var1 <- pair[1]
+  var2 <- pair[2]
+  
+  # Fit the hierarchical linear model (mixed effects model)
+  formula <- as.formula(paste(var1, "~", var2, "+ (1 | sub) + (1 | day)")) #+ (1 | condition)
+  model <- lmer(formula, data = filtered_data)
+  
+  # Summarize the model to check the significance of the variable
+  summary_model <- summary(model)
+  print(summary_model)
+  
+  # Extract the p-value for the fixed effect
+  anova_model <- anova(model)
+  p_value <- anova_model$`Pr(>F)`[1]
+  print(paste("P-value for the fixed effect of", var2, "on", var1, ":", p_value))
+  
+  # Create a scatter plot with regression line and distinct colors for subjects
+  plot <- ggplot(filtered_data, aes_string(x = var2, y = var1, color = "factor(sub)")) +
+    geom_point(alpha = 0.6) +  # Scatter plot with distinct color for each subject
+    geom_smooth(method = "lm", se = TRUE, color = "blue") +  # Regression line with 95% CI
+    labs(x = var2, y = var1, 
+         title = paste("Correlation between", var1, "and", var2, "\n (p =", format(p_value, digits = 3), ")")) +
+    scale_color_discrete(name = "Subject") +  # Discrete color scale for subjects
+    theme_minimal() +
+    theme(
+      plot.title = element_text(size = 20),  # Adjust title size
+      axis.title = element_text(size = 16),  # Adjust axis title size
+      axis.text = element_text(size = 14),   # Adjust axis text size
+      legend.title = element_text(size = 14),  # Adjust legend title size
+      legend.text = element_text(size = 12)    # Adjust legend text size
+    )
+  
+  # Print the plot
+  print(plot)
+}

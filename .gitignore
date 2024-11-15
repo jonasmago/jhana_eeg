@@ -1,3 +1,6 @@
 data/
 results/
 venv/
+.Rproj.user
+*.fif
+*.png
