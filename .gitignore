@@ -4,3 +4,4 @@ venv/
 .Rproj.user
 *.fif
 *.png
+*sub*
